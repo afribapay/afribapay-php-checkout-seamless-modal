@@ -18,7 +18,7 @@ For full API documentation, refer to: [docs.afribapay.com](https://docs.afribapa
 
 1. **Clone the repository**  
 ```bash
-git clone https://github.com/your-org/afribapay-php-checkout-seamless-modal.git
+git clone https://github.com/afribapay/afribapay-php-checkout-seamless-modal.git
 ```
 
 2. **Include the SDK in your project**  
@@ -32,17 +32,50 @@ This config file contains your API credentials and settings:
 
 ```php
 return [
-    'apiUser'        => 'your-public-api-user-key',     // 🔐 Public identifier for the API client
-    'apiKey'         => 'your-private-api-key',         // 🔒 Secret key for authenticating API requests
-    'merchantKey'    => 'your-merchant-key',            // 🧾 Merchant account identifier
-    'agent_id'       => 'your-agent-id',                // 🤝 Agent or partner ID
-    'environment'    => 'production',                   // 🌍 'sandbox' or 'production'
-    'lang'           => 'fr',                           // 🗣 Language preference ('en' or 'fr')
-    'notify_url'     => 'https://yourdomain.com/webhook/notify', // 📬 IPN endpoint
-    'checkoutPath'   => '/afribapay-php-checkout-seamless-modal/checkout/', // 🧩 Frontend path to the modal
-    'useCacheFolder' => true,                           // 🧠 Enables server-side caching
-    'cacheDirectory' => sys_get_temp_dir(),             // 📁 Cache storage directory
+
+    // 🔐 Public identifier for your API integration.
+    // Used to identify your application when initiating transactions.
+    'apiUser' => 'your-public-api-user-key',
+
+    // 🔒 Private secret key for authenticating API requests.
+    // This key must remain confidential—never expose it in client-side code.
+    'apiKey' => 'your-private-api-key',
+
+    // 🧾 Unique identifier for your merchant account.
+    // Associates all transactions with your AfribaPay merchant profile.
+    'merchantKey' => 'your-merchant-key',
+
+    // 🤝 Identifier for the agent or partner handling transactions.
+    // Useful for affiliate tracking and account-level segmentation.
+    'agent_id' => 'your-agent-id',
+
+    // 🌍 Environment mode for the API.
+    // Use 'sandbox' for testing and 'production' for live transactions.
+    'environment' => 'production',
+
+    // 🗣 Language for the checkout modal and system messages.
+    // Supported values: 'fr' for French, 'en' for English.
+    'lang' => 'fr',
+
+    // 📬 URL that AfribaPay will use to send payment status notifications (IPN).
+    // This should be a public endpoint on your server that can handle POST requests.
+    'notify_url' => 'https://yourdomain.com/webhook/notify',
+
+    // 🧩 Path to the embedded checkout modal.
+    // This must match the accessible URL path to the modal on your web server.
+    // Example: if your files are hosted at example.com/checkout/, set this to '/checkout/'
+    'checkoutPath' => '/checkout/',
+
+    // 🧠 Enable or disable server-side caching of session/payment data.
+    // Recommended: true (fallbacks to cookies if false).
+    'useCacheFolder' => true,
+
+    // 📁 Filesystem path where cache files will be stored (used only if 'useCacheFolder' is true).
+    // Defaults to the system temp directory, but can be customized if needed.
+    'cacheDirectory' => sys_get_temp_dir(),
+
 ];
+
 ```
 
 ---
@@ -116,23 +149,24 @@ echo $AfribaPayButton->createCheckoutButton($request, '💳 Payer maintenant', '
 
 ## 📦 AfribapayRequest Object
 
-| Property         | Type    | Description                                        |
-|------------------|---------|----------------------------------------------------|
-| `amount`         | Float   | Amount to be paid                                 |
-| `currency`       | String  | Currency code (e.g., `XOF`, `USD`, etc.)          |
-| `order_id`       | String  | Unique ID for the order                           |
-| `reference_id`   | String  | Unique reference ID used for merchant tracking    |
-| `notify_url`     | String  | IPN URL where payment status updates are sent     |
-| `lang`           | String  | Language for the modal content                    |
-| `country`        | String  | Country code (e.g., `BF`)                         |
-| `showCountries`  | Boolean | Whether to allow country selection in the modal   |
+
+| Property        | Type    | Required   | Description                                                                       |
+| --------------- | ------- | ---------- | --------------------------------------------------------------------------------- |
+| `amount`        | float   | ✅ Yes      | Amount to be paid by the user. Must be greater than zero.                         |
+| `currency`      | string  | ✅ Yes      | 3-letter ISO currency code (e.g., `XOF`, `USD`, `GNF`).                           |
+| `country`       | string  | ✅ Yes      | ISO 2-letter country code (e.g., `BF` for Burkina Faso).                          |
+| `notify_url`    | string  | ✅ Yes      | Fully-qualified URL where AfribaPay will send payment status notifications (IPN). |
+| `order_id`      | string  | ❌ Optional | Unique ID for the order. If not set, it will be auto-generated.                   |
+| `reference_id`  | string  | ❌ Optional | Reference string for merchant-side tracking and reconciliation.                   |
+| `lang`          | string  | ❌ Optional | Language code for the modal (`en`, `fr`, etc.). Defaults to `en`.                 |
+| `showCountries` | boolean | ❌ Optional | Whether to allow the user to select a country in the modal. Defaults to `true`.   |
 
 ---
 
 ## 📚 Documentation & Support
 
 - Full documentation: [https://docs.afribapay.com](https://docs.afribapay.com)
-- Support: contact@afribapay.com
+- Support: support@afribapay.com
 
 ---
 
