@@ -162,7 +162,7 @@ $checkoutPath = $params['checkoutPath'] ?? '/';
 
             async function waitResponse(e) {
                 if ((e = e.response ?? e).error)
-                    e.message ? (alertMessage(e.message, "warning"), replaceFormWithFailledIcon(e.message)) : (alertMessage(e.error.reason, "warning"), "FAILED" == e.error.status ? replaceFormWithFailledIcon(e.error.reason) : replaceFormWithFailledIcon(AfribapayClass.afribapayLang.FAILLED_MESSAGE)), switchBadge("danger");
+                    e.message ? (alertMessage(e.message, "warning"), replaceFormWithFailledIcon(e.message)) : (alertMessage(e.error.message, "warning"), "FAILED" == e.error.status ? replaceFormWithFailledIcon(e.error.message) : replaceFormWithFailledIcon(AfribapayClass.afribapayLang.FAILLED_MESSAGE)), switchBadge("danger");
                 else if (e.data)
                     if ("PENDING" === (e = e.data).status) {
                         if (replaceFormWithLoadingSpinner(), alertMessage(AfribapayClass.afribapayLang.PENDING_MESSAGE, "info"), e?.provider_link && !waveWindowOpened) {
@@ -170,7 +170,7 @@ $checkoutPath = $params['checkoutPath'] ?? '/';
                             openWaveFront(a), waveWindowOpened = !0
                         }
                         checkTransactionStatus(e.order_id)
-                    } else "SUCCESS" === e.status ? (replaceFormWithSuccessIcon(), addTransactionInfo(e), switchBadge("success")) : (replaceFormWithFailledIcon(e.reason), addTransactionInfo(e), switchBadge("danger"));
+                    } else "SUCCESS" === e.status ? (replaceFormWithSuccessIcon(), addTransactionInfo(e), switchBadge("success")) : (replaceFormWithFailledIcon(e.message), addTransactionInfo(e), switchBadge("danger"));
                 else replaceFormWithFailledIcon(AfribapayClass.afribapayLang.FAILLED_OPERATOR), switchBadge("danger")
             }
 
@@ -185,7 +185,7 @@ $checkoutPath = $params['checkoutPath'] ?? '/';
                         });
                         if (!a.ok) throw new Error("Error checking payment status");
                         const n = await a.json();
-                        n.response.error ? (clearInterval(t), replaceFormWithFailledIcon(n.response.error.reason), switchBadge("danger")) : n.response.data && ("PENDING" !== n.response.data.status ? (waitResponse(n), clearInterval(t)) : (r++, r >= 3 && (replaceFormWithRetryButton(e), addTransactionInfo(n.response.data), clearInterval(t), switchBadge("warning"))))
+                        n.response.error ? (clearInterval(t), replaceFormWithFailledIcon(n.response.error.message), switchBadge("danger")) : n.response.data && ("PENDING" !== n.response.data.status ? (waitResponse(n), clearInterval(t)) : (r++, r >= 3 && (replaceFormWithRetryButton(e), addTransactionInfo(n.response.data), clearInterval(t), switchBadge("warning"))))
                     } catch (e) {
                     }
                 }), 1e4)
@@ -472,7 +472,7 @@ $checkoutPath = $params['checkoutPath'] ?? '/';
                         return response.json();
                     }).then(data => {
                         if (data.httpCode !== 200) {
-                            reject(new Error(data.response.error.reason || "Wallet OTP generation failed"));
+                            reject(new Error(data.response.error.message || "Wallet OTP generation failed"));
                         } else {
                             resolve(data); 
                         }
